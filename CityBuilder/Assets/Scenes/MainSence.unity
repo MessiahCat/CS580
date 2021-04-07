@@ -163,8 +163,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 47daa09caea2a694f9acae052399277d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  row: 27
-  col: 48
+  row_y: 27
+  col_x: 48
   tile: {fileID: 9100368069498075007, guid: 8f92012bb8f6aa94c81869826d5d39a1, type: 3}
 --- !u!1 &519420028
 GameObject:

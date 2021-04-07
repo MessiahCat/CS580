@@ -6,9 +6,9 @@ public class Main : MonoBehaviour
 {
     //Please Keep the Ratio of Col::Row to 16::9
     [SerializeField]
-    private int row;
+    private int row_y;
     [SerializeField]
-    private int col;
+    private int col_x;
     [SerializeField]
     private GameObject tile;
 
@@ -19,8 +19,8 @@ public class Main : MonoBehaviour
         SetTileMap();
 
         //x from left to right is 0 to n;
-        //y from top to bow is 0 to n;
-        //All the tile with tag "Tile"
+        //y from top to bot is 0 to n;
+        //All the tiles with tag "Tile"
 
         //Test
         #region Test & Delete
@@ -52,9 +52,9 @@ public class Main : MonoBehaviour
     {
         float tileSize = tile.GetComponent<SpriteRenderer>().sprite.bounds.size.x;
         Vector3 startpoint = Camera.main.ScreenToWorldPoint(new Vector3(0, Screen.height));
-        for (int i = 0; i < row; i++)
+        for (int i = 0; i < row_y; i++)
         {
-            for (int j = 0; j < col; j++)
+            for (int j = 0; j < col_x; j++)
             {
                 GameObject newTile = Instantiate(tile);
                 newTile.transform.position = new Vector3(startpoint.x+ tileSize*j,startpoint.y - tileSize*i,0);
@@ -75,7 +75,7 @@ public class Main : MonoBehaviour
 
     void SetCamera() 
     {
-        Camera.main.orthographicSize = 27*col/16;
+        Camera.main.orthographicSize = 27*col_x/16;
     }
 
 }

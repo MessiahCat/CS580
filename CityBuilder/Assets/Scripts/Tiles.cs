@@ -4,18 +4,23 @@ using UnityEngine;
 
 public class Tiles: MonoBehaviour
 {
-    // Start is called before the first frame update
-    public int x { get; set; }
-    public int y { get; set; }
+  public Tiles()
+  {
+    x = 0;
+    y = 0;
+  }
 
-    public int TileProperties { get; set; }
+  // Start is called before the first frame update
+  public int x { get; set; }
+  public int y { get; set; }
 
-    public int TileBuildings { get; set; }
+  public TileProperties tileProperties_ { get; set; }
+  public TileBuildings tileBuildings_ { get; set; }
 
 
-    private void Start()
-    { 
-    }
+  private void Start()
+  { 
+  }
 
 
 }

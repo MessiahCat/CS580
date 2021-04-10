@@ -12,14 +12,19 @@ public class TileProperties
     densityScore_ = 0;
     roadsideScore_ = 0;
     alignmentScore_ = 0;
-    isDirty_ = false;
+    occupied_ = false;
+    isDirty_ = true;
   }
 
   public void Update()
   {
     if(isDirty_)
     {
-      totalScore_ = connectionScore_ + densityScore_ + roadsideScore_ + alignmentScore_;
+      if (occupied_)
+        totalScore_ = 0;
+      else 
+        totalScore_ = connectionScore_ + densityScore_ + roadsideScore_ + alignmentScore_ + 1;
+      isDirty_ = false;
     }
   }
 
@@ -29,5 +34,6 @@ public class TileProperties
   public int densityScore_ { get; set; }
   public int roadsideScore_ { get; set; }
   public int alignmentScore_ { get; set; }
+  public bool occupied_ { get; set; }
   public bool isDirty_ { get; set; }
 }

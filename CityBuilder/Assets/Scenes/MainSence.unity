@@ -166,6 +166,11 @@ MonoBehaviour:
   row_y: 27
   col_x: 48
   tile: {fileID: 9100368069498075007, guid: 8f92012bb8f6aa94c81869826d5d39a1, type: 3}
+  mode: 0
+  seed: 42
+  growth: 0
+  density: 10
+  startPopulation: 10
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0

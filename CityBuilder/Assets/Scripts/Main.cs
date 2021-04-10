@@ -5,18 +5,30 @@ using UnityEngine;
 public class Main : MonoBehaviour
 {
   //Please Keep the Ratio of Col::Row to 16::9
+  //rows
   [SerializeField]
   private int row_y;
+  //columns
   [SerializeField]
   private int col_x;
+  //tile prefab
   [SerializeField]
   private GameObject tile;
+  // 0 is nothing, 1 is a single step, 2 is all steps
+  [SerializeField]
+  private int mode;
+  //seed for rng
+  [SerializeField]
+  private int seed;
+  [SerializeField]
+  private int growth;
+  [SerializeField]
+  private int density;
+  [SerializeField]
+  private int startPopulation;
 
   //whether what the grid is drawing should be updated
   static bool redraw = true;
-
-  // 0 is nothing, 1 is a single step, 2 is all steps
-  static int mode = 0;
 
   //holds the main grid
   static TileGrid grid;
@@ -34,40 +46,34 @@ public class Main : MonoBehaviour
       tile = Instantiate(Resources.Load("Tile")) as GameObject;
       Debug.Log("Tile never set");
     }
+    if (mode == 0)
+      mode = 0;
+    if (seed == 0)
+      seed = 42;
+    if (growth == 0)
+      growth = 1;
+    if (density == 0)
+      density = 1;
+    if (startPopulation == 0)
+      startPopulation = 10;
 
     //build the grid
     grid = new TileGrid(col_x, row_y);
-    //test
-    grid.info_.population_ = 10;
+    //Set info
+    grid.info_.growth_ = growth;
+    grid.info_.density_ = density;
+    grid.info_.startPopulation_ = startPopulation;
+    grid.info_.population_ = startPopulation;
 
     SetCamera();
     SetTileMap();
 
     //init random seed
-    Random.InitState(42);
+    Random.InitState(seed);
     Random.Range(1, 4);
 
     //x from left to right is 0 to n;
     //y from top to bot is 0 to n;
-    //All the tiles with tag "Tile"
-
-    //Test
-    //#region Test & Delete
-    //GameObject[] Tiles = GameObject.FindGameObjectsWithTag("Tile");
-    //for (int i = 0; i < Tiles.Length; i++)
-    //{
-    //  if (Tiles[i].GetComponent<Tiles>().y == Tiles[i].GetComponent<Tiles>().x)
-    //  {
-    //   Tiles[i].GetComponent<SpriteRenderer>().color = Color.red;
-    // }
-    //
-    // if (Tiles[i].GetComponent<Tiles>().tileProperties_.totalScore_ == 1)
-    // {
-    //   Tiles[i].GetComponent<SpriteRenderer>().color = Color.blue;
-    // }
-    //}
-    //#endregion
-    //Endtest
 
     Debug.Log("Init Complete");
   }
@@ -97,16 +103,7 @@ public class Main : MonoBehaviour
         newTile.transform.position = new Vector3(startpoint.x+ tileSize*j,startpoint.y - tileSize*i,0);
         newTile.GetComponent<Tiles>().x = j;
         newTile.GetComponent<Tiles>().y = i;
-        newTile.GetComponent<Tiles>().tileProperties_ = new TileProperties(new GridPos(i,j));
-
-        newTile.GetComponent<Tiles>().tileProperties_.totalScore_ = 1;
-
-        //for test use
-        //if (j % 2 == 1 && i % 2 == 1 || j % 2 == 0 && i % 2 == 0)
-        // {
-        //  newTile.GetComponent<Tiles>().tileProperties_.totalScore_ = 1;
-        // }
-        //end
+        newTile.GetComponent<Tiles>().tileProperties_ = new TileProperties(new GridPos(j,i));
         grid.gameObjects_.Add(newTile);           
       }
     }
@@ -135,16 +132,15 @@ public class Main : MonoBehaviour
       int x = 0;
       int y = 0;
       int i = 0;
-      foreach(GameObject g in grid.gameObjects_)
+
+      Debug.Log("max score = " + grid.info_.maxScore_);
+
+      foreach (GameObject g in grid.gameObjects_)
       {
-        //if (g.GetComponent<Tiles>().tileProperties_.totalScore_ == 1)
-        //{
-          //g.GetComponent<SpriteRenderer>().color = Color.blue;
-          float scorePercent = g.GetComponent<Tiles>().tileProperties_.totalScore_ / grid.info_.gridScore_ * 52;
-          if (scorePercent > 1.0f)
-            scorePercent = 1;
-          g.GetComponent<SpriteRenderer>().color = new Color(1.0f, 1.0f, 1.0f - scorePercent);
-        //}
+        float scorePercent = (float)g.GetComponent<Tiles>().tileProperties_.totalScore_ / (grid.info_.maxScore_ * 2);
+        if (scorePercent > 1.0f)
+          scorePercent = 1;
+        g.GetComponent<SpriteRenderer>().color = new Color(1.0f- scorePercent, 1.0f- scorePercent, 1.0f );
 
         //Give tiles with buildings a unique color
         if (g.GetComponent<Tiles>().tileBuildings_ != null)
@@ -166,6 +162,8 @@ public class Main : MonoBehaviour
         y = i / grid.rows_;
       }
       redraw = false;
+
+      grid.GetTile(47,26).GetComponent<SpriteRenderer>().color = Color.black;
     }
   }
   
@@ -185,15 +183,19 @@ public class Main : MonoBehaviour
       //Carry on one step
       SingleStep();
       mode = 0;
+
+      redraw = true;
     }
     else if(mode == 2)
     {
       //Continuously do steps until finished
       if (SingleStep())
         mode = 0;
+
+      redraw = true;
     }
 
-    redraw = true;
+    
   }
 
   bool SingleStep()
@@ -260,8 +262,10 @@ public class Main : MonoBehaviour
         Debug.Log("Placing a building");
 
         //total score of 0 cannot be picked
-        g.GetComponent<Tiles>().tileProperties_.totalScore_ = 0;
 
+        //declare occupied
+        g.GetComponent<Tiles>().tileProperties_.occupied_ = true;
+        
         //place resident->business->utility
         if (grid.info_.residential_ < grid.info_.population_  )
         {
@@ -272,15 +276,16 @@ public class Main : MonoBehaviour
         else if(grid.info_.business_ < grid.info_.population_/3 )
         {
           g.GetComponent<Tiles>().tileBuildings_ = new TileBuildings(g.GetComponent<Tiles>().tileProperties_.pos_, 2, ++grid.info_.business_);
-          
           grid.info_.buildings_.Add(g.GetComponent<Tiles>().tileBuildings_);
         }
         else if (grid.info_.utility_ < grid.info_.population_/5 )
         {
-          g.GetComponent<Tiles>().tileBuildings_ = new TileBuildings(g.GetComponent<Tiles>().tileProperties_.pos_, 3, ++grid.info_.utility_);
-          
+          g.GetComponent<Tiles>().tileBuildings_ = new TileBuildings(g.GetComponent<Tiles>().tileProperties_.pos_, 3, ++grid.info_.utility_);     
           grid.info_.buildings_.Add(g.GetComponent<Tiles>().tileBuildings_);
         }
+
+        grid.SpreadDensity(g.GetComponent<Tiles>().tileProperties_.pos_);
+        grid.SpreadAlignment(g.GetComponent<Tiles>().tileProperties_.pos_);
 
         //update grid
         grid.UpdateGridScore();

@@ -16,6 +16,7 @@ public class Info
     roads_ = new List<Road>();
     cost_ = 0;
     gridScore_ = 0;
+    maxScore_ = 0;
     residential_ = 0;
     business_ = 0;
     utility_ = 0;
@@ -31,6 +32,7 @@ public class Info
     steps_ = 0;
     cost_ = 0;
     gridScore_ = 0;
+    maxScore_ = 0;
     residential_ = 0;
     business_ = 0;
     utility_ = 0;
@@ -46,6 +48,7 @@ public class Info
   public List<Road> roads_ { get; set; }
   public int cost_ { get; set; }
   public int gridScore_ { get; set; }
+  public int maxScore_ { get; set; }
   public int residential_ { get; set; }
   public int business_ { get; set; }
   public int utility_ { get; set; }

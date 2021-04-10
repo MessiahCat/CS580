@@ -64,7 +64,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Scripts\GridPos.cs" />
+    <Compile Include="Assets\Scripts\Info.cs" />
     <Compile Include="Assets\Scripts\Main.cs" />
+    <Compile Include="Assets\Scripts\Road.cs" />
+    <Compile Include="Assets\Scripts\TileBuilding.cs" />
+    <Compile Include="Assets\Scripts\TileGrid.cs" />
+    <Compile Include="Assets\Scripts\TileProperties.cs" />
     <Compile Include="Assets\Scripts\Tiles.cs" />
     <Reference Include="Unity.Timeline.Editor">
       <HintPath>C:/Users/Administrator.DESKTOP-KJH8S7E/Documents/GitHub/CS580_Digipen_CityBuild/CS580/CityBuilder/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>

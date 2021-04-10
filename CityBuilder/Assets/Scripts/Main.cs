@@ -156,6 +156,10 @@ public class Main : MonoBehaviour
           else if (g.GetComponent<Tiles>().tileBuildings_.type_ == 3)
             g.GetComponent<SpriteRenderer>().color = Color.red;
         }
+        if (g.GetComponent<Tiles>().InRoad.Count != 0)
+        {
+            g.GetComponent<SpriteRenderer>().color = Color.black;
+        }
 
         ++i;
         x = i % grid.columns_;
@@ -304,10 +308,142 @@ public class Main : MonoBehaviour
 //-trim all roads leading off the grid
   bool Step2()
   {
+        int i = 0;
+        foreach (GameObject g in grid.gameObjects_)
+        {
+            if (g.GetComponent<Tiles>().tileBuildings_ != null)
+            {
+                int x = g.GetComponent<Tiles>().x;
+                int y = g.GetComponent<Tiles>().y;
+                //vertical left
+                Road_vertical(x-1, y, i);
+                //vertical right
+                Road_vertical(x+1, y, i);
+                //Horizon bot
+                Road_Horrizon(x, y + 1, i);
+                //Horizon Top
+                Road_Horrizon(x, y - 1, i);
 
-    return true;
+            }
+        }
+
+        return false;
   }
+    void Road_Horrizon(int x, int y, int i)
+    {
+        int xs = x - 1;//to left, min
+        int xe = x;//to right +
+        int start = 0;
+        int end = col_x;
+        if (y >= 0 && y < row_y)
+        {
+            while (xs >= 0 || xe < col_x)
+            {
+                if (xs >= 0)
+                {
+                    if (grid.Tile(xs, y).GetComponent<Tiles>().tileBuildings_ == null /*&& grid.Tile(xs, y).GetComponent<Tiles>().InRoad.Count == 0*/)
+                    {
+                        grid.Tile(xs, y).GetComponent<Tiles>().InRoad.Add(i);
+                        xs--;
+                    }
+                    //else if (grid.Tile(xs, y).GetComponent<Tiles>().tileBuildings_ == null && grid.Tile(xs, y).GetComponent<Tiles>().InRoad.Count != 0)
+                    //{
+                    //    grid.Tile(xs, y).GetComponent<Tiles>().InRoad.Add(i);
+                    //    //start = xs;
+                    //    //xs = -1;
+                    //    xs--;
+                    //}
+                    else
+                    {
+                        start = xs + 1;
+                        xs = -1;
+                    }
+                }
 
+                if (xe < col_x)
+                {
+                    if (grid.Tile(xe, y).GetComponent<Tiles>().tileBuildings_ == null /*&& grid.Tile(xe, y).GetComponent<Tiles>().InRoad.Count == 0*/)
+                    {
+                        grid.Tile(xe, y).GetComponent<Tiles>().InRoad.Add(i);
+                        xe++;
+                    }
+                    //else if (grid.Tile(xe, y).GetComponent<Tiles>().tileBuildings_ == null && grid.Tile(xe, y).GetComponent<Tiles>().InRoad.Count != 0)
+                    //{
+                    //    grid.Tile(xe, y).GetComponent<Tiles>().InRoad.Add(i);
+                    //    //end = xe;
+                    //    //xe = 99999;
+                    //    xe++;
+                    //}
+                    else
+                    {
+                        end = xe - 1;
+                        xe = 99999;
+                    }
+                }
+            }
+            grid.info_.roads_.Add(new Road(i, 0, start, end));
+
+
+        }
+    }
+    void Road_vertical(int x, int y, int i) 
+    {
+        int x1 = x;
+        int ys = y - 1;//to top, min
+        int ye = y;//to bot +
+        int start = 0;
+        int end = row_y;
+        if (x >= 0 && x < col_x)
+        {
+            while (ys >= 0 || ye < row_y)
+            {
+                if (ys >= 0)
+                {
+                    if (grid.Tile(x1, ys).GetComponent<Tiles>().tileBuildings_ == null /*&& grid.Tile(x1, ys).GetComponent<Tiles>().InRoad.Count == 0*/)
+                    {
+                        grid.Tile(x1, ys).GetComponent<Tiles>().InRoad.Add(i);
+                        ys--;
+                    }
+                    //else if (grid.Tile(x1, ys).GetComponent<Tiles>().tileBuildings_ == null && grid.Tile(x1, ys).GetComponent<Tiles>().InRoad.Count != 0)
+                    //{
+                    //    grid.Tile(x1, ys).GetComponent<Tiles>().InRoad.Add(i);
+                    //    //start = ys;
+                    //    //ys = -1;
+                    //    ys--;
+                    //}
+                    else
+                    {
+                        start = ys+1;
+                        ys = -1;
+                    }
+                }
+
+                if (ye < row_y)
+                {
+                    if (grid.Tile(x1, ye).GetComponent<Tiles>().tileBuildings_ == null /*&& grid.Tile(x1, ye).GetComponent<Tiles>().InRoad.Count == 0*/)
+                    {
+                        grid.Tile(x1, ye).GetComponent<Tiles>().InRoad.Add(i);
+                        ye++;
+                    }
+                    //else if (grid.Tile(x1, ye).GetComponent<Tiles>().tileBuildings_ == null && grid.Tile(x1, ye).GetComponent<Tiles>().InRoad.Count != 0)
+                    //{
+                    //    grid.Tile(x1, ye).GetComponent<Tiles>().InRoad.Add(i);
+                    //    //end = ye;
+                    //    //ye = 99999;
+                    //    ye++;
+                    //}
+                    else
+                    {
+                        end = ye - 1;
+                        ye = 99999;
+                    }
+                }
+            }
+            grid.info_.roads_.Add(new Road(i, 1, start, end));
+            
+            
+        }
+    }
 //Step 3: Optimize
 //---
 //No idea

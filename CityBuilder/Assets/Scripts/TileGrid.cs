@@ -29,6 +29,20 @@ public class TileGrid
     }
   }
 
+    public GameObject Tile(int x, int y) 
+    {
+        foreach (GameObject g in gameObjects_) 
+        {
+            if (g.GetComponent<Tiles>().x == x && g.GetComponent<Tiles>().y == y)
+            {
+                return g;
+            }
+        }
+
+        return null;
+
+    }
+
     private void Start()
     { 
     }

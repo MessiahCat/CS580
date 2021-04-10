@@ -8,16 +8,20 @@ public class Tiles: MonoBehaviour
   {
     x = 0;
     y = 0;
+    isRoad = false;
   }
 
-  // Start is called before the first frame update
   public int x { get; set; }
   public int y { get; set; }
 
   public TileProperties tileProperties_ { get; set; }
   public TileBuildings tileBuildings_ { get; set; }
 
+    //for road use
+  public List<int> InRoad;
 
+  public bool isRoad { get; set; }
+    
   private void Start()
   { 
   }

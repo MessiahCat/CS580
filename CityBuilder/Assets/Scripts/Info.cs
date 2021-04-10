@@ -49,4 +49,5 @@ public class Info
   public int residential_ { get; set; }
   public int business_ { get; set; }
   public int utility_ { get; set; }
+
 }

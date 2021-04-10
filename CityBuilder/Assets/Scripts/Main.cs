@@ -316,20 +316,32 @@ public class Main : MonoBehaviour
                 int x = g.GetComponent<Tiles>().x;
                 int y = g.GetComponent<Tiles>().y;
                 //vertical left
-                Road_vertical(x-1, y, i);
+                if (Road_vertical(x - 1, y, i) == true )
+                {
+                    i++;
+                }
                 //vertical right
-                Road_vertical(x+1, y, i);
+                if (Road_vertical(x + 1, y, i) == true)
+                {
+                    i++;
+                }
                 //Horizon bot
-                Road_Horrizon(x, y + 1, i);
+                if (Road_Horrizon(x, y + 1, i) == true)
+                {
+                    i++;
+                }
                 //Horizon Top
-                Road_Horrizon(x, y - 1, i);
+                if (Road_Horrizon(x, y - 1, i) == true)
+                {
+                    i++;
+                }
 
             }
         }
 
         return false;
   }
-    void Road_Horrizon(int x, int y, int i)
+    bool Road_Horrizon(int x, int y, int i)
     {
         int xs = x - 1;//to left, min
         int xe = x;//to right +
@@ -382,11 +394,12 @@ public class Main : MonoBehaviour
                 }
             }
             grid.info_.roads_.Add(new Road(i, 0, start, end));
-
+            return true;
 
         }
+        return false;
     }
-    void Road_vertical(int x, int y, int i) 
+    bool Road_vertical(int x, int y, int i) 
     {
         int x1 = x;
         int ys = y - 1;//to top, min
@@ -440,9 +453,11 @@ public class Main : MonoBehaviour
                 }
             }
             grid.info_.roads_.Add(new Road(i, 1, start, end));
-            
+            return true;
             
         }
+
+        return false;
     }
 //Step 3: Optimize
 //---

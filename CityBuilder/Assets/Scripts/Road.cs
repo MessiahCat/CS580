@@ -8,15 +8,19 @@ public class Road
 
   public int startP { get; set; }
   public int endP { get; set; }
-  public GridPos pos_ { get; set; }
+  public int pos_ { get; set; }
   public int type_ { get; set; }
   public int connected_ { get; set; }
 
-  public Road(int number,int type, int start, int end) 
+  public int Connect_Buildings { get; set; }
+
+  public Road(int number,int type, int start, int end,int pos,int build) 
   {
         this.number_ = number;
         this.type_ = type;
         this.startP = start;
         this.endP = end;
+        this.pos_ = pos;
+        this.Connect_Buildings = build;
   }
 }

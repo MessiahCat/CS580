@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class Tiles: MonoBehaviour
 {
+    [SerializeField]
+    int count;
   public Tiles()
   {
     x = 0;
@@ -25,6 +27,9 @@ public class Tiles: MonoBehaviour
   private void Start()
   { 
   }
-
+  private void update()
+  {
+        count = InRoad.Count;
+  }
 
 }

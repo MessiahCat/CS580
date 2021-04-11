@@ -1020,30 +1020,28 @@ public class Main : MonoBehaviour
     {
       grid.info_.population_ += 10;
       once = false;
-      step2complete = false;
+      //step2complete = false;
 
-      step2SetRoadLoop.value_ = 0;
-      step2RemoveRoadLoop.value_ = 0;
-      step2ConnectSingleBuildingLoop.value_ = 0;
-      step2CleanUpRoadsLoop.value_ = 0;
-      return false;
+      //step2SetRoadLoop.value_ = 0;
+      //step2RemoveRoadLoop.value_ = 0;
+      //step2ConnectSingleBuildingLoop.value_ = 0;
+      //step2CleanUpRoadsLoop.value_ = 0;
+      //return false;
+      while (!Step1()) ;
     }
 
-    //or do everything here
-
-    //grid.info_.population_ += 10;
-    //while (!Step1()) ;
-
     //while (!SetRoads(step3SetRoadLoop)) ;
-
     //while (!Road_Remover(step3RemoveRoadLoop)) ;
-
     //while (!Connect_SingleBuilding(step3ConnectSingleBuildingLoop)) ;
-
     //while (!CleanUpRoads(step3CleanUpRoadsLoop)) ;
+
+    Step5Helper();
 
     return true;
   }
 
+  void Step5Helper()
+  {
 
+  }
 }

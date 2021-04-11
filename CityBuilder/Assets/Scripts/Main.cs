@@ -54,7 +54,7 @@ public class Main : MonoBehaviour
   static LoopHolder step3ConnectSingleBuildingLoop = new LoopHolder(0);
   static LoopHolder step3CleanUpRoadsLoop = new LoopHolder(0);
 
-  static bool once = true;
+  static int times = 0;
 
   //camera stuff
   static Vector3 camRotation = new Vector3();
@@ -66,10 +66,15 @@ public class Main : MonoBehaviour
   //ideal everything
   //pos 250, -190, -174
   //rot -30,-20,20
-  static Vector3 topPos = new Vector3(140,-80,-135);
+  static Vector3 topPos = new Vector3(140,-80,-140);
   static Vector3 topRot = new Vector3(0,0,0);
   static Vector3 angledPos = new Vector3(250,-190,-174);
   static Vector3 angledRot = new Vector3(-30,-20,20);
+
+  //cube
+  static GameObject house;
+  static GameObject business;
+  static GameObject utility;
 
   //holds the main grid
   static TileGrid grid;
@@ -97,6 +102,10 @@ public class Main : MonoBehaviour
       density = 1;
     if (startPopulation == 0)
       startPopulation = 10;
+
+    house = Instantiate(Resources.Load("House")) as GameObject;
+    business = Instantiate(Resources.Load("Business")) as GameObject;
+    utility = Instantiate(Resources.Load("Utility")) as GameObject;
 
     //build the grid
     grid = new TileGrid(col_x, row_y);
@@ -155,7 +164,7 @@ public class Main : MonoBehaviour
 
   void SetCamera()
   {
-    Camera.main.transform.Translate(140, -80, -125);
+    Camera.main.transform.Translate(140, -80, -130);
     //Camera.main.orthographicSize = 27 * col_x / 16;
 
     //float rotateX = 50;
@@ -206,9 +215,28 @@ public class Main : MonoBehaviour
       redraw = false;
 
       //grid.GetTile(47, 26).GetComponent<SpriteRenderer>().color = Color.black;
+
+      //GameObject newTile = Instantiate(cubey);
+
+      //newTile.transform.position = new Vector3(grid.GetTile(47, 26).transform.position.x+3, grid.GetTile(47, 26).transform.position.y-3, -2.5f);
+      //newTile.transform.localScale += new Vector3(4, 4, 4);
     }
   }
 
+  //Keybinds
+  //---------------
+  // N - NextStep Mode
+  // D - Camera right
+  // A - Camera left
+  // W - Camera up
+  // S - Camera down
+  // T - Camera zoom in
+  // Y - Camera zoom out
+  // Q - Camera rotate left
+  // E - Camera rotate right
+  // Z - Camera tilt up
+  // X - Camera tilt down
+  // B - Camera Switch between two angles
   void InputManager()
   {
     //A single step
@@ -363,25 +391,49 @@ public class Main : MonoBehaviour
 
         //total score of 0 cannot be picked
 
+        //check if surrounded, do step over is so
+        int x = g.GetComponent<Tiles>().x;
+        int y = g.GetComponent<Tiles>().y;
+        if ((!grid.InGrid(x + 1, y) || grid.GetTile(x + 1, y).GetComponent<Tiles>().tileBuildings_ != null) &&
+          (!grid.InGrid(x - 1, y) || grid.GetTile(x - 1, y).GetComponent<Tiles>().tileBuildings_ != null) &&
+          (!grid.InGrid(x, y + 1) || grid.GetTile(x, y + 1).GetComponent<Tiles>().tileBuildings_ != null) &&
+          (!grid.InGrid(x, y - 1) || grid.GetTile(x, y - 1).GetComponent<Tiles>().tileBuildings_ != null))
+          return Step1();
+
         //declare occupied
-        g.GetComponent<Tiles>().tileProperties_.occupied_ = true;
+          g.GetComponent<Tiles>().tileProperties_.occupied_ = true;
 
         //place resident->business->utility
         if (grid.info_.residential_ < grid.info_.population_)
         {
           g.GetComponent<Tiles>().tileBuildings_ = new TileBuildings(g.GetComponent<Tiles>().tileProperties_.pos_, 1, ++grid.info_.residential_);
           grid.info_.buildings_.Add(g.GetComponent<Tiles>().tileBuildings_);
+
+          GameObject ga = Instantiate(house);
+
+          ga.transform.position = new Vector3(g.transform.position.x + 3, g.transform.position.y - 3, -2.5f);
+          ga.transform.localScale += new Vector3(4, 4, 4);
           //Debug.Log("Resident Placed");
         }
         else if (grid.info_.business_ < grid.info_.population_ / 3)
         {
           g.GetComponent<Tiles>().tileBuildings_ = new TileBuildings(g.GetComponent<Tiles>().tileProperties_.pos_, 2, ++grid.info_.business_);
           grid.info_.buildings_.Add(g.GetComponent<Tiles>().tileBuildings_);
+
+          GameObject ga = Instantiate(business);
+
+          ga.transform.position = new Vector3(g.transform.position.x + 3, g.transform.position.y - 3, -2.5f);
+          ga.transform.localScale += new Vector3(4, 4, 4);
         }
         else if (grid.info_.utility_ < grid.info_.population_ / 5)
         {
           g.GetComponent<Tiles>().tileBuildings_ = new TileBuildings(g.GetComponent<Tiles>().tileProperties_.pos_, 3, ++grid.info_.utility_);
           grid.info_.buildings_.Add(g.GetComponent<Tiles>().tileBuildings_);
+
+          GameObject ga = Instantiate(utility);
+
+          ga.transform.position = new Vector3(g.transform.position.x + 3, g.transform.position.y - 3, -2.5f);
+          ga.transform.localScale += new Vector3(4, 4, 4);
         }
 
         grid.info_.buildingCount_++;
@@ -1091,11 +1143,13 @@ public class Main : MonoBehaviour
   //Place more buildings or grow based a growth value
   bool Step5()
   {
+
+
     //to use previous steps, call this
-    if(once == true)
+    if(times < growth)
     {
-      grid.info_.population_ += 10;
-      once = true;
+      grid.info_.population_ += grid.info_.startPopulation_;
+      times++;
       //step2complete = false;
 
       //step2SetRoadLoop.value_ = 0;
@@ -1104,14 +1158,22 @@ public class Main : MonoBehaviour
       //step2CleanUpRoadsLoop.value_ = 0;
       //return false;
       while (!Step1()) ;
+
+      //while (!SetRoads(step3SetRoadLoop)) ;
+      //while (!Road_Remover(step3RemoveRoadLoop)) ;
+      //while (!Connect_SingleBuilding(step3ConnectSingleBuildingLoop)) ;
+      //while (!CleanUpRoads(step3CleanUpRoadsLoop)) ;
+
+      Step5Helper();
+      grid.SpreadRoadSide();
+      grid.UpdateGridScore();
     }
-
-    //while (!SetRoads(step3SetRoadLoop)) ;
-    //while (!Road_Remover(step3RemoveRoadLoop)) ;
-    //while (!Connect_SingleBuilding(step3ConnectSingleBuildingLoop)) ;
-    //while (!CleanUpRoads(step3CleanUpRoadsLoop)) ;
-
-    Step5Helper();
+    else
+    {
+      Step5Helper();
+      grid.SpreadRoadSide();
+      grid.UpdateGridScore();
+    }
 
     return true;
   }

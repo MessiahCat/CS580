@@ -42,6 +42,16 @@ public class TileGrid
     return true;
   }
 
+  public bool InGrid(GridPos spot)
+  {
+    if (spot.x < 0 || spot.x >= columns_)
+      return false;
+    if (spot.y < 0 || spot.y >= rows_)
+      return false;
+
+    return true;
+  }
+
   public void SpreadDensity(GridPos spot)
   {
     foreach (GameObject g in gameObjects_)

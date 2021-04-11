@@ -102,6 +102,104 @@ public class TileGrid
 
     }
   }
+  public void SpreadRoadSide()
+  {
+    foreach (Road r in info_.roads_)
+    {
+      int x;
+      int y;
+
+      //Debug.Log("start and end is : " + r.startP + "->" + r.endP + ")");
+
+      if (r.type_ == 0)
+      {
+        x = r.startP;
+        y = r.pos_;
+
+        while(x != r.endP)
+        {
+          //Debug.Log("Location is : (" + x + "," + y + ")");
+          GameObject g = GetTile(x, y);
+          g.GetComponent<Tiles>().tileProperties_.occupied_ = true;
+          g.GetComponent<Tiles>().tileProperties_.isDirty_ = true;
+
+          if (r.startP < r.endP)
+            x++;
+          else
+            x--;
+
+          for (int i = 0; i != 4; ++i)
+          {
+            GridPos temp = new GridPos(g.GetComponent<Tiles>().tileProperties_.pos_);
+            switch (i)
+            {
+              case 0:
+                temp.x += 1;
+                break;
+              case 1:
+                temp.x -= 1;
+                break;
+              case 2:
+                temp.y += 1;
+                break;
+              default:
+                temp.y -= 1;
+                break;
+            }
+            if (InGrid(temp.x, temp.y))
+            {
+              GameObject gh = GetTile(temp);
+              gh.GetComponent<Tiles>().tileProperties_.roadsideScore_ += 20;
+              gh.GetComponent<Tiles>().tileProperties_.isDirty_ = true;
+            }
+          }
+        }
+      }
+      else if (r.type_ == 1)
+      {
+        x = r.pos_;
+        y = r.startP;
+
+        while (y != r.endP)
+        {
+          GameObject g = GetTile(x, y);
+          g.GetComponent<Tiles>().tileProperties_.occupied_ = true;
+          g.GetComponent<Tiles>().tileProperties_.isDirty_ = true;
+
+          if (r.startP < r.endP)
+            y++;
+          else
+            y--;
+
+          for (int i = 0; i != 4; ++i)
+          {
+            GridPos temp = new GridPos(g.GetComponent<Tiles>().tileProperties_.pos_);
+            switch (i)
+            {
+              case 0:
+                temp.x += 1;
+                break;
+              case 1:
+                temp.x -= 1;
+                break;
+              case 2:
+                temp.y += 1;
+                break;
+              default:
+                temp.y -= 1;
+                break;
+            }
+            if (InGrid(temp.x, temp.y))
+            {
+              GameObject gh = GetTile(temp);
+              gh.GetComponent<Tiles>().tileProperties_.roadsideScore_ += 20;
+              gh.GetComponent<Tiles>().tileProperties_.isDirty_ = true;
+            }
+          }
+        }
+      }
+    }
+  }
 
   public GameObject GetTile(GridPos spot)
   {

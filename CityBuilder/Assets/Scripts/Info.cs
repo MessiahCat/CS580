@@ -14,6 +14,8 @@ public class Info
     steps_ = 0;
     buildings_ = new List<TileBuildings>();
     roads_ = new List<Road>();
+    buildingCount_ = 0;
+    roadCount_ = 0;
     cost_ = 0;
     gridScore_ = 0;
     maxScore_ = 0;
@@ -30,6 +32,10 @@ public class Info
 
     population_ = 0;
     steps_ = 0;
+    buildings_ = new List<TileBuildings>();
+    roads_ = new List<Road>();
+    buildingCount_ = 0;
+    roadCount_ = 0;
     cost_ = 0;
     gridScore_ = 0;
     maxScore_ = 0;
@@ -46,6 +52,8 @@ public class Info
   public int steps_ { get; set; }
   public List<TileBuildings> buildings_ { get; set; }
   public List<Road> roads_ { get; set; }
+  public int buildingCount_ { get; set; }
+  public int roadCount_ { get; set; }
   public int cost_ { get; set; }
   public int gridScore_ { get; set; }
   public int maxScore_ { get; set; }

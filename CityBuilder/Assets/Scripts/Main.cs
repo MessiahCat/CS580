@@ -313,12 +313,16 @@ public class Main : MonoBehaviour
     //-trim all roads leading off the grid
     bool Step2()
     {
+        //Set roads of each side of a building
         SetRoads();
 
+        // remove all roads except the one with the most buildings next to it or its‘connected’ roads
         Road_Remover();
 
+        // if build has no roads next to it, create one to the nearest road
         Connect_SingleBuilding();
-        
+
+        //trim all roads leading off the grid
         CleanUpRoads();
         return false;
     }

@@ -30,11 +30,30 @@ public class Main : MonoBehaviour
   //whether what the grid is drawing should be updated
   static bool redraw = true;
 
+  public class LoopHolder
+  {
+    public LoopHolder(int hold)
+    {
+      value_ = hold;
+    }
+
+    public int value_ { get; set; }
+  }
+
   //for single steps in step 2
-  static int step2SetRoadLoop = 0;
-  static int step2RemoveRoadLoop = 0;
-  static int step2ConnectSingleBuildingLoop = 0;
-  static int step2CleanUpRoadsLoop = 0;
+  static LoopHolder step2SetRoadLoop = new LoopHolder(0);
+  static LoopHolder step2RemoveRoadLoop = new LoopHolder(0);
+  static LoopHolder step2ConnectSingleBuildingLoop = new LoopHolder(0);
+  static LoopHolder step2CleanUpRoadsLoop = new LoopHolder(0);
+  static bool step2complete = false;
+
+  //for single steps in step 3
+  static LoopHolder step3SetRoadLoop = new LoopHolder(0);
+  static LoopHolder step3RemoveRoadLoop = new LoopHolder(0);
+  static LoopHolder step3ConnectSingleBuildingLoop = new LoopHolder(0);
+  static LoopHolder step3CleanUpRoadsLoop = new LoopHolder(0);
+
+  static bool once = true;
 
   //holds the main grid
   static TileGrid grid;
@@ -320,36 +339,40 @@ public class Main : MonoBehaviour
   //-trim all roads leading off the grid
   bool Step2()
   {
-    if (SetRoads())
-      if (Road_Remover())
-        if (Connect_SingleBuilding())
-          if (CleanUpRoads())
-          {
-            Debug.Log("completed step2");
-            return true;
-          }
-     
-    return false;
+    if (!step2complete)
+    {
+      if (SetRoads(step2SetRoadLoop))
+        if (Road_Remover(step2RemoveRoadLoop))
+          if (Connect_SingleBuilding(step2ConnectSingleBuildingLoop))
+            if (CleanUpRoads(step2CleanUpRoadsLoop))
+            {
+              Debug.Log("completed step2");
+              step2complete = true;
+              return true;
+            }
+      return false;
+    }
+    return true;
   }
-  bool CleanUpRoads()
+  bool CleanUpRoads(LoopHolder looper)
   {
     //if gone through all buildings, step complete
-    if (step2CleanUpRoadsLoop == grid.info_.roads_.Count)
+    if (looper.value_ == grid.info_.roads_.Count)
     {
       //do once
-      step2CleanUpRoadsLoop++;
+      looper.value_++;
       grid.SpreadRoadSide();
       grid.UpdateGridScore();
       return true;
     }
-    if (step2CleanUpRoadsLoop == grid.info_.roads_.Count + 1)
+    if (looper.value_ == grid.info_.roads_.Count + 1)
     {
       return true;
     }
 
     bool nothingHappened = true;
 
-    Road r = grid.info_.roads_[step2CleanUpRoadsLoop];
+    Road r = grid.info_.roads_[looper.value_];
     if (r.type_ == 0 && r.startP == 0)
     {
       int i = 0;
@@ -445,11 +468,11 @@ public class Main : MonoBehaviour
 
     if(nothingHappened)
     {
-      step2CleanUpRoadsLoop++;
-      return CleanUpRoads();
+      looper.value_++;
+      return CleanUpRoads(looper);
     }
 
-    step2CleanUpRoadsLoop++;
+    looper.value_++;
     return false;
   }
   bool Deletable(GameObject tile, int type)
@@ -484,20 +507,20 @@ public class Main : MonoBehaviour
     }
     return true;
   }
-  bool Connect_SingleBuilding()
+  bool Connect_SingleBuilding(LoopHolder loop)
   {
     //if gone through all buildings, step complete
-    if (step2ConnectSingleBuildingLoop == grid.info_.buildingCount_)
+    if (loop.value_ == grid.info_.buildingCount_)
     {
       return true;
     }
 
     //Debug.Log("step2RemoveRoadLoop = " + step2RemoveRoadLoop);
-    if (is_single(grid.GetTile(grid.info_.buildings_[step2ConnectSingleBuildingLoop].pos_)))
+    if (is_single(grid.GetTile(grid.info_.buildings_[loop.value_].pos_)))
     {
       //retieve x and y from building
-      int x = grid.info_.buildings_[step2ConnectSingleBuildingLoop].pos_.x;
-      int y = grid.info_.buildings_[step2ConnectSingleBuildingLoop].pos_.y;
+      int x = grid.info_.buildings_[loop.value_].pos_.x;
+      int y = grid.info_.buildings_[loop.value_].pos_.y;
 
       int shortest = 1;
       //0:up, 1:down, 2:left, 3:right
@@ -565,11 +588,11 @@ public class Main : MonoBehaviour
     }
     else
     {
-      step2ConnectSingleBuildingLoop++;
-      return Connect_SingleBuilding();
+      loop.value_++;
+      return Connect_SingleBuilding(loop);
     }
 
-    step2ConnectSingleBuildingLoop++;
+    loop.value_++;
     return false;
   }
   int generate_index()
@@ -652,16 +675,16 @@ public class Main : MonoBehaviour
       r.connected_ = total;
     }
   }
-  bool Road_Remover()
+  bool Road_Remover(LoopHolder loop)
   {
-    if (step2RemoveRoadLoop == grid.info_.buildingCount_)
+    if (loop.value_ == grid.info_.buildingCount_)
     {
       //this is to only call it once
-      step2RemoveRoadLoop++;
+      loop.value_++;
       
       return true;
     }
-    if (step2RemoveRoadLoop == grid.info_.buildingCount_ + 1)
+    if (loop.value_ == grid.info_.buildingCount_ + 1)
     {
       return true;
     }
@@ -670,8 +693,8 @@ public class Main : MonoBehaviour
 
     //retieve x and y from building
     List<int> road = new List<int>();
-    int x = grid.info_.buildings_[step2RemoveRoadLoop].pos_.x;
-    int y = grid.info_.buildings_[step2RemoveRoadLoop].pos_.y;
+    int x = grid.info_.buildings_[loop.value_].pos_.x;
+    int y = grid.info_.buildings_[loop.value_].pos_.y;
 
     //Debug.Log("grid pos = " + x + "," + y);
 
@@ -731,7 +754,7 @@ public class Main : MonoBehaviour
       }
     }
 
-    step2RemoveRoadLoop++;
+    loop.value_++;
     return false;
   }
   void delete_Road(int Rnum)
@@ -770,24 +793,24 @@ public class Main : MonoBehaviour
     }
 
   }
-  bool SetRoads()
+  bool SetRoads(LoopHolder loop)
   {
     //if gone through all buildings, step complete
-    if (step2SetRoadLoop == grid.info_.buildingCount_)
+    if (loop.value_ == grid.info_.buildingCount_)
     {
       //this is to only call it once
-      step2SetRoadLoop++;
+      loop.value_++;
       Caculate_Conection();
       return true;
     }
-    if(step2SetRoadLoop == grid.info_.buildingCount_ + 1)
+    if(loop.value_ == grid.info_.buildingCount_ + 1)
     {
       return true;
     }
 
     //retieve x and y from building
-    int x = grid.info_.buildings_[step2SetRoadLoop].pos_.x;
-    int y = grid.info_.buildings_[step2SetRoadLoop].pos_.y;
+    int x = grid.info_.buildings_[loop.value_].pos_.x;
+    int y = grid.info_.buildings_[loop.value_].pos_.y;
 
     //vertical left
     if (Road_vertical(x - 1, y, grid.info_.roadCount_) == true)
@@ -811,7 +834,7 @@ public class Main : MonoBehaviour
     }
 
     //move loop
-    step2SetRoadLoop++;
+    loop.value_++;
 
     //step is not complete
     return false;
@@ -992,8 +1015,32 @@ public class Main : MonoBehaviour
   //Place more buildings or grow based a growth value
   bool Step5()
   {
-    grid.info_.population_ += 10;
-    while (Step1() != true) ;
+    //to use previous steps, call this
+    if(once == true)
+    {
+      grid.info_.population_ += 10;
+      once = false;
+      step2complete = false;
+
+      step2SetRoadLoop.value_ = 0;
+      step2RemoveRoadLoop.value_ = 0;
+      step2ConnectSingleBuildingLoop.value_ = 0;
+      step2CleanUpRoadsLoop.value_ = 0;
+      return false;
+    }
+
+    //or do everything here
+
+    //grid.info_.population_ += 10;
+    //while (!Step1()) ;
+
+    //while (!SetRoads(step3SetRoadLoop)) ;
+
+    //while (!Road_Remover(step3RemoveRoadLoop)) ;
+
+    //while (!Connect_SingleBuilding(step3ConnectSingleBuildingLoop)) ;
+
+    //while (!CleanUpRoads(step3CleanUpRoadsLoop)) ;
 
     return true;
   }

@@ -55,6 +55,21 @@ public class Main : MonoBehaviour
 
   static bool once = true;
 
+  //camera stuff
+  static Vector3 camRotation = new Vector3();
+  static int cameraStatus = 1;
+  //top view
+  //pos 140, -80, -130
+  //rot 0,0,0
+
+  //ideal everything
+  //pos 250, -190, -174
+  //rot -30,-20,20
+  static Vector3 topPos = new Vector3(140,-80,-130);
+  static Vector3 topRot = new Vector3(0,0,0);
+  static Vector3 angledPos = new Vector3(250,-190,-174);
+  static Vector3 angledRot = new Vector3(-30,-20,20);
+
   //holds the main grid
   static TileGrid grid;
 
@@ -90,8 +105,8 @@ public class Main : MonoBehaviour
     grid.info_.startPopulation_ = startPopulation;
     grid.info_.population_ = startPopulation;
 
-    SetCamera();
     SetTileMap();
+    SetCamera();
 
     //init random seed
     Random.InitState(seed);
@@ -139,7 +154,8 @@ public class Main : MonoBehaviour
 
   void SetCamera()
   {
-    Camera.main.orthographicSize = 27 * col_x / 16;
+    Camera.main.transform.Translate(140, -80, -120);
+    //Camera.main.orthographicSize = 27 * col_x / 16;
 
     //float rotateX = 50;
     //Camera.main.transform.eulerAngles = new Vector3(0, 0, 0);
@@ -198,6 +214,64 @@ public class Main : MonoBehaviour
     if (Input.GetKeyDown(KeyCode.N))
     {
       mode = 1;
+    }
+
+    if (Input.GetKeyDown(KeyCode.D))
+      Camera.main.transform.Translate(10, 0, 0);
+    if (Input.GetKeyDown(KeyCode.A))
+      Camera.main.transform.Translate(-10, 0, 0);
+
+    if (Input.GetKeyDown(KeyCode.W))
+      Camera.main.transform.Translate(0, 10, 0);
+    if (Input.GetKeyDown(KeyCode.S))
+      Camera.main.transform.Translate(0, -10, 0);
+
+    if (Input.GetKeyDown(KeyCode.T))
+      Camera.main.transform.Translate(0, 0, 10);
+    if (Input.GetKeyDown(KeyCode.Y))
+      Camera.main.transform.Translate(0, 0, -10);
+
+    if (Input.GetKeyDown(KeyCode.Q))
+    {
+      camRotation.z -= 10;
+      camRotation.y += 10;
+      Camera.main.transform.rotation = Quaternion.Euler(camRotation);
+    }
+    if (Input.GetKeyDown(KeyCode.E))
+    {
+      camRotation.z += 10;
+      camRotation.y -= 10;
+      Camera.main.transform.rotation = Quaternion.Euler(camRotation);
+    }
+    
+    if (Input.GetKeyDown(KeyCode.Z))
+    {
+      camRotation.x -= 10;
+      Camera.main.transform.rotation = Quaternion.Euler(camRotation);
+    }
+    
+    if (Input.GetKeyDown(KeyCode.X))
+    {
+      camRotation.x += 10;
+      Camera.main.transform.rotation = Quaternion.Euler(camRotation);
+    }
+
+    if (Input.GetKeyDown(KeyCode.B))
+    {
+      if (cameraStatus == 1)
+      {
+        cameraStatus = 2;
+        Camera.main.transform.Translate(angledPos - Camera.main.transform.position);
+        Camera.main.transform.rotation = Quaternion.Euler(angledRot);
+      }  
+      else if (cameraStatus == 2)
+      {
+        cameraStatus = 1;
+        Camera.main.transform.rotation = Quaternion.Euler(topRot);
+        Camera.main.transform.Translate(topPos - Camera.main.transform.position);
+        
+      }
+
     }
   }
 

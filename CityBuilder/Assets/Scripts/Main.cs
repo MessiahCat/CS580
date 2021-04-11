@@ -1580,8 +1580,10 @@ public class Main : MonoBehaviour
                     }
                     if (direction == 2)
                     {
-                        for (int i = x-1; i >= shortest; i++)
+                        for (int i = x-1; i >= shortest; i--)
                         {
+                            Debug.Log(i);
+                            Debug.Log(y);
                             grid.Tile(i, y).GetComponent<Tiles>().InRoad.Add(index);
                         }
                         grid.info_.roads_.Add(new Road(index, 0, shortest, x, y, 0));

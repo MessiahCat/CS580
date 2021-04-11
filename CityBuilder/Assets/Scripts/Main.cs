@@ -992,6 +992,8 @@ public class Main : MonoBehaviour
   //Place more buildings or grow based a growth value
   bool Step5()
   {
+    grid.info_.population_ += 10;
+    while (Step1() != true) ;
 
     return true;
   }

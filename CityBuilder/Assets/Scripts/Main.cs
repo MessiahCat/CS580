@@ -169,7 +169,7 @@ public class Main : MonoBehaviour
       }
       redraw = false;
 
-      grid.GetTile(47, 26).GetComponent<SpriteRenderer>().color = Color.black;
+      //grid.GetTile(47, 26).GetComponent<SpriteRenderer>().color = Color.black;
     }
   }
 

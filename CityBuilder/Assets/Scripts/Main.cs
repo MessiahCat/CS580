@@ -1121,7 +1121,12 @@ public class Main : MonoBehaviour
         extentRoad();
         connect_singlebuilding5();
         CleanUpRoads5();
+        CleanData();
   }
+    void CleanData() 
+    {
+
+    }
     void CleanUpRoads5() 
     {
         foreach (Road r in grid.info_.roads_)
@@ -1173,13 +1178,16 @@ public class Main : MonoBehaviour
             }
             if (r.type_ == 1 && r.endP == row_y - 1)
             {
-                int i = 0;
                 int type = r.type_;
                 int x = r.pos_;
                 int y = r.endP;
                 bool loop = true;
                 while (loop == true)
                 {
+                    if (y < 0)
+                    {
+                        break;
+                    }
                     if (Deletable(grid.Tile(x, y), type))
                     {
                         grid.Tile(x, y).GetComponent<Tiles>().InRoad.Clear();
@@ -1299,7 +1307,7 @@ public class Main : MonoBehaviour
                     }
                 }
 
-                if (r.endP <row_y && grid.Tile(r.pos_, r.endP + 1).GetComponent<Tiles>().tileBuildings_ == null)
+                if (r.endP <row_y-1 && grid.Tile(r.pos_, r.endP + 1).GetComponent<Tiles>().tileBuildings_ == null)
                 {
                     int y = r.endP;
                     bool until_end = true;
@@ -1337,153 +1345,192 @@ public class Main : MonoBehaviour
                     //retieve x and y from building
                     int x = g.GetComponent<Tiles>().x;
                     int y = g.GetComponent<Tiles>().y;
-                    Debug.Log(x);
-                    Debug.Log(y);
                     int shortest = 999;
                     //0:up, 1:down, 2:left, 3:right
                     int direction = 0;
                     // to left
                     #region Solu1
-                    if (x != 0)
+                    if (x >= 2)
                     {
-                        int count = 1;
-                        while (x - count >= 0)
+                        int target_x = x-1;
+                        bool able = true;
+                        while (true)
                         {
-                            if (grid.Tile(x - count, y).GetComponent<Tiles>().tileBuildings_ != null)
+                            if (grid.Tile(target_x, y).GetComponent<Tiles>().tileBuildings_ != null)
                             {
-                                count = 1000;
+                                able = false;
                                 break;
                             }
-                            if (grid.Tile(x - count, y).GetComponent<Tiles>().InRoad.Count != 0)
+                            if (target_x == 0)
+                            {
+                                able = false;
+                                break;
+                            }
+                            if (grid.Tile(target_x, y).GetComponent<Tiles>().InRoad.Count != 0)
                             {
                                 break;
                             }
-                            if (grid.Tile(x - count, y).GetComponent<Tiles>().InRoad.Count == 0)
+                            if (grid.Tile(target_x, y).GetComponent<Tiles>().InRoad.Count == 0)
                             {
-                                count++;
+                                target_x -= 1;
                             }
                         }
-                        if (count < shortest)
+                        if (able == true)
                         {
-                            shortest = count;
-                            direction = 2;
+                            int distance = Mathf.Abs( target_x - x); 
+                            if (distance < shortest)
+                            {
+                                shortest = target_x;
+                                direction = 2;
+                            }
                         }
+                        
                     }
                     // to right
-                    if (x < col_x)
+                    if (x < col_x-2)
                     {
-                        int count = 1;
-                        while (x + count < col_x)
+                        int target_x = x + 1;
+                        bool able = true;
+                        while (true)
                         {
-                            if (grid.Tile(x + count, y).GetComponent<Tiles>().tileBuildings_ != null)
+                            if (grid.Tile(target_x, y).GetComponent<Tiles>().tileBuildings_ != null)
                             {
-                                count = 1000;
+                                able = false;
                                 break;
                             }
-                            if (grid.Tile(x + count, y).GetComponent<Tiles>().InRoad.Count != 0)
+                            if (target_x == col_x-1)
+                            {
+                                able = false;
+                                break;
+                            }
+                            if (grid.Tile(target_x, y).GetComponent<Tiles>().InRoad.Count != 0)
                             {
                                 break;
                             }
-                            if (grid.Tile(x + count, y).GetComponent<Tiles>().InRoad.Count == 0)
+                            if (grid.Tile(target_x, y).GetComponent<Tiles>().InRoad.Count == 0)
                             {
-                                count++;
+                                target_x ++;
                             }
                         }
-                        if (count < shortest)
+                        if (able == true)
                         {
-                            shortest = count;
-                            direction = 3;
+                            int distance = Mathf.Abs( target_x - x);
+                            if (distance < shortest)
+                            {
+                                shortest = target_x;
+                                direction = 3;
+                            }
                         }
                     }
                     // to bot
-                    if (y < row_y)
+                    if (y < row_y - 2)
                     {
-                        int count = 1;
-                        while (y + count < row_y)
+                        int target_y = y + 1;
+                        bool able = true;
+                        while (true)
                         {
-                            if (grid.Tile(x, y + count).GetComponent<Tiles>().tileBuildings_ != null)
+                            if (grid.Tile(x, target_y).GetComponent<Tiles>().tileBuildings_ != null)
                             {
-                                count = 1000;
+                                able = false;
                                 break;
                             }
-                            if (grid.Tile(x, y + count).GetComponent<Tiles>().InRoad.Count != 0)
+                            if (target_y == row_y - 1)
+                            {
+                                able = false;
+                                break;
+                            }
+                            if (grid.Tile(x, target_y).GetComponent<Tiles>().InRoad.Count != 0)
                             {
                                 break;
                             }
-                            if (grid.Tile(x, y + count).GetComponent<Tiles>().InRoad.Count == 0)
+                            if (grid.Tile(x, target_y).GetComponent<Tiles>().InRoad.Count == 0)
                             {
-                                count++;
+                                target_y++;
                             }
                         }
-                        if (count < shortest)
+                        if (able == true)
                         {
-                            shortest = count;
-                            direction = 1;
+                            int distance =Mathf.Abs (target_y - y);
+                            if (distance < shortest)
+                            {
+                                shortest = target_y;
+                                direction = 1;
+                            }
                         }
                     }
                     // to top
-                    if (y != 0)
+                    if (y >= 2)
                     {
-                        int count = 1;
-                        while (y - count >= 0)
+                        int target_y = y - 1;
+                        bool able = true;
+                        while (true)
                         {
-                            if (grid.Tile(x, y - count).GetComponent<Tiles>().tileBuildings_ != null)
+                            if (grid.Tile(x, target_y).GetComponent<Tiles>().tileBuildings_ != null)
                             {
-                                count = 1000;
+                                able = false;
                                 break;
                             }
-                            if (grid.Tile(x, y - count).GetComponent<Tiles>().InRoad.Count != 0)
+                            if (target_y == 0)
+                            {
+                                able = false;
+                                break;
+                            }
+                            if (grid.Tile(x, target_y).GetComponent<Tiles>().InRoad.Count != 0)
                             {
                                 break;
                             }
-                            if (grid.Tile(x, y - count).GetComponent<Tiles>().InRoad.Count == 0)
+                            if (grid.Tile(x, target_y).GetComponent<Tiles>().InRoad.Count == 0)
                             {
-                                count++;
+                                target_y--;
                             }
                         }
-                        if (count < shortest)
+                        if (able == true)
                         {
-                            shortest = count;
-                            direction = 0;
+                            int distance = Mathf.Abs( target_y - y);
+                            if (distance < shortest)
+                            {
+                                shortest = target_y;
+                                direction = 0;
+                            }
                         }
                     }
                     #endregion
 
-
+                    
 
                     int index = generate_index();
                     if (direction == 0)
                     {
-                        for (int i = 1; i <= shortest; i++)
+                        for (int i = y-1; i >= shortest; i--)
                         {
-                            grid.Tile(x, y - i).GetComponent<Tiles>().InRoad.Add(index);
+                            grid.Tile(x, i).GetComponent<Tiles>().InRoad.Add(index);
 
                         }
-                        grid.info_.roads_.Add(new Road(index, 1, y, y - shortest, x, 0));
+                        grid.info_.roads_.Add(new Road(index, 1, shortest, y, x, 0));
                     }
                     if (direction == 1)
                     {
-                        for (int i = 1; i <= shortest; i++)
+                        for (int i = y+1; i <= shortest; i++)
                         {
-                            grid.Tile(x, y + i).GetComponent<Tiles>().InRoad.Add(index);
+                            grid.Tile(x, i).GetComponent<Tiles>().InRoad.Add(index);
                         }
-                        grid.info_.roads_.Add(new Road(index, 1, y, y + shortest, x, 0));
+                        grid.info_.roads_.Add(new Road(index, 1, y, shortest, x, 0));
                     }
                     if (direction == 2)
                     {
-                        for (int i = 1; i < shortest; i++)
+                        for (int i = x-1; i >= shortest; i++)
                         {
-                            grid.Tile(x - i, y).GetComponent<Tiles>().InRoad.Add(index);
+                            grid.Tile(i, y).GetComponent<Tiles>().InRoad.Add(index);
                         }
-                        grid.info_.roads_.Add(new Road(index, 0, x, x - shortest, y, 0));
+                        grid.info_.roads_.Add(new Road(index, 0, shortest, x, y, 0));
                     }
                     if (direction == 3)
                     {
-                        for (int i = 1; i <= shortest; i++)
+                        for (int i = x+1; i <= shortest; i++)
                         {
-                            grid.Tile(x + i, y).GetComponent<Tiles>().InRoad.Add(index);
+                            grid.Tile(i, y).GetComponent<Tiles>().InRoad.Add(index);
                         }
-                        grid.info_.roads_.Add(new Road(index, 0, x, x + shortest, y, 0));
+                        grid.info_.roads_.Add(new Road(index, 0, x, shortest, y, 0));
                     }
 
                 }

@@ -6,6 +6,7 @@ public class Info
 {
   public Info()
   {
+    seed_ = 0;
     growth_ = 0;
     density_ = 0;
     startPopulation_ = 0;
@@ -26,6 +27,7 @@ public class Info
 
   public Info(float growth, int density, int startPopulation)
   {
+    seed_ = 0;
     growth_ = growth;
     density_ = density;
     startPopulation_ = startPopulation;
@@ -44,6 +46,7 @@ public class Info
     utility_ = 0;
   }
 
+  public int seed_ { get; set; }
   public float growth_ { get; set; }
   public int density_ { get; set; }
   public int startPopulation_ { get; set; }

@@ -10,12 +10,14 @@ public class TileGrid
     columns_ = columns;
     info_ = new Info();
     gameObjects_ = new List<GameObject>();
+    buildingObjects_ = new List<GameObject>();
   }
 
   // Start is called before the first frame update
   public int rows_ { get; set; }
   public int columns_ { get; set; }
   public List<GameObject> gameObjects_ { get; set; }
+  public List<GameObject> buildingObjects_ { get; set; }
   public Info info_ { get; set; }
 
   public void UpdateGridScore()
